@@ -17,7 +17,7 @@ export default new class RewardsController {
     async index(req, res) { //get número de pontos
         let { id_client } = req.params; //captura o numero do cliente pelo query da requisição
         let masterDataDocumentResponse =
-            await axios.get(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.DOCUMENT_ID}?_fields=${id_client}`,
+            await axios.get(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.MASTERDATA_DOCUMENT_ID}?_fields=${id_client}`,
                 {headers:{"X-VTEX-API-AppKey": process.env.X_VTEX_API_AppKey, "X-VTEX-API-AppToken": process.env.X_VTEX_API_AppToken}});
         let points = await masterDataDocumentResponse.data[id_client].points; // puxar os pontos do banco de dados pelo número do cliente
         return res.status(201).json({ "points": points }); // retorna o número de pontos do cliente
@@ -39,11 +39,11 @@ export default new class RewardsController {
             let orderValue = totalOrderItemsValue + (await orderResponse.data.totals[1].value); //valor total dos pontos (deduzindo o desconto)
 
             let masterDataDocumentResponse =
-                await axios.get(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.DOCUMENT_ID}?_fields=${id_client}`,
+                await axios.get(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.MASTERDATA_DOCUMENT_ID}?_fields=${id_client}`,
                 {headers:{"X-VTEX-API-AppKey": process.env.X_VTEX_API_AppKey, "X-VTEX-API-AppToken": process.env.X_VTEX_API_AppToken}});
 
              if (!masterDataDocumentResponse.data[id_client]) {
-                let responseUpdate = await axios.patch(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.DOCUMENT_ID}`, {
+                let responseUpdate = await axios.patch(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.MASTERDATA_DOCUMENT_ID}`, {
                     [id_client]: {
                         id_client,
                         "points": orderValue,
@@ -59,7 +59,7 @@ export default new class RewardsController {
                 res.status(responseUpdate.status).json({"Response":"Ok - User's First Order"});
              } else {
                 if(!masterDataDocumentResponse.data[id_client].orders[OrderId]){
-                    let responseUpdate = await axios.patch(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.DOCUMENT_ID}`, 
+                    let responseUpdate = await axios.patch(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.MASTERDATA_DOCUMENT_ID}`, 
                     {
                         [id_client]: {
                             ...masterDataDocumentResponse.data[id_client],
@@ -80,7 +80,6 @@ export default new class RewardsController {
                 }
                 res.status(400).json({"error": "The Order is already accounted on user's points"});
              }
-        //     //logica para creditar
          } else if (State === "canceled") { //verifica se o estado do pedido é cancelado
              //logica para debitar
          }
