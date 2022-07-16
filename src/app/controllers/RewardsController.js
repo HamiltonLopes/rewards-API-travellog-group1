@@ -37,16 +37,18 @@ export default new class RewardsController {
             let id_client = await orderResponse.data.clientProfileData.userProfileId; //captura o número do cliente pelo pedido
             let totalOrderItemsValue = await orderResponse.data.totals[0].value; //valor total dos itens do pedido
             let orderValue = totalOrderItemsValue + (await orderResponse.data.totals[1].value); //valor total dos pontos (deduzindo o desconto)
+            let points = ((orderValue/100)+"").split(".")[0]; //Logica para eliminar os centavos
 
+            //get no documento do masterdata
             let masterDataDocumentResponse =
                 await axios.get(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.MASTERDATA_DOCUMENT_ID}?_fields=${id_client}`,
                 {headers:{"X-VTEX-API-AppKey": process.env.X_VTEX_API_AppKey, "X-VTEX-API-AppToken": process.env.X_VTEX_API_AppToken}});
 
-             if (!masterDataDocumentResponse.data[id_client]) {
+             if (!masterDataDocumentResponse.data[id_client]) { // se for a primeira compra do usuario
                 let responseUpdate = await axios.patch(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.MASTERDATA_DOCUMENT_ID}`, {
                     [id_client]: {
                         id_client,
-                        "points": orderValue,
+                        points,
                         "orders": {
                             [OrderId]: {
                                 orderValue,
@@ -57,13 +59,13 @@ export default new class RewardsController {
                 },{headers:{"X-VTEX-API-AppKey": process.env.X_VTEX_API_AppKey, "X-VTEX-API-AppToken": process.env.X_VTEX_API_AppToken}});
 
                 res.status(responseUpdate.status).json({"Response":"Ok - User's First Order"});
-             } else {
+             } else { //se o usuario já tiver comprado anteriormente
                 if(!masterDataDocumentResponse.data[id_client].orders[OrderId]){
                     let responseUpdate = await axios.patch(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.MASTERDATA_DOCUMENT_ID}`, 
                     {
                         [id_client]: {
                             ...masterDataDocumentResponse.data[id_client],
-                            "points": orderValue + masterDataDocumentResponse.data[id_client].points,
+                            "points": points + masterDataDocumentResponse.data[id_client].points,
                             "orders": {
                                 ...masterDataDocumentResponse.data[id_client].orders,
                                 [OrderId]: {
