@@ -1,6 +1,8 @@
 import express from 'express';
 import Routes from './router.js';
 import bodyParser from 'body-parser';
+import { Router } from 'express';
+
 
 class App {
     constructor(){
@@ -15,6 +17,7 @@ class App {
     }
 
     routes(){
+        this.server.use(new Router().get('/', (req,res)=> res.status(200).json({"AWS CONFIG":"OK"})));
         this.server.use(`/${process.env.API_NAME}/${process.env.API_VERSION}`,Routes);
     }
 } 
