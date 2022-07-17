@@ -15,7 +15,6 @@ export default new class RewardsController {
     // }; // estrutura do cliente
 
     async index(req, res) { //get número de pontos
-        console.log(req);z
         let { id_client } = req.params; //captura o numero do cliente pelo query da requisição
         let masterDataDocumentResponse =
             await axios.get(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.MASTERDATA_DOCUMENT_ID}?_fields=${id_client}`,
@@ -25,7 +24,6 @@ export default new class RewardsController {
     }
 
     async store(req, res) { //post altera número de pontos
-        console.log(req);
         let { OrderId, State, hookConfig } = req.body; // captura as variaveis número do pedido, estado do pedido e configuração
         if (hookConfig) //se possuir a variavel configuração, significa que o request foi somente de configuração
             return res.status(200).json({ "Config": "Successful" }); //retorna um status 200 para informar que a configuração foi bem sucedida
