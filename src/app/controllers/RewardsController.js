@@ -35,9 +35,10 @@ export default new class RewardsController {
                 {headers:{"X-VTEX-API-AppKey": process.env.X_VTEX_API_AppKey, "X-VTEX-API-AppToken": process.env.X_VTEX_API_AppToken}}); //getOrderById captura informação do pedido pelo número do pedido
             
             let id_client = await orderResponse.data.clientProfileData.userProfileId; //captura o número do cliente pelo pedido
+            let orderValue = await orderResponse.data.value; // valor total do pedido
             let totalOrderItemsValue = await orderResponse.data.totals[0].value; //valor total dos itens do pedido
-            let orderValue = totalOrderItemsValue + (await orderResponse.data.totals[1].value); //valor total dos pontos (deduzindo o desconto)
-            let points = ((orderValue/100)+"").split(".")[0]; //Logica para eliminar os centavos
+            let orderValueWithoutShip = totalOrderItemsValue + (await orderResponse.data.totals[1].value); //valor total dos pontos (deduzindo o desconto)
+            let points = ((orderValueWithoutShip/100)+"").split(".")[0]; //Logica para eliminar os centavos
 
             //get no documento do masterdata
             let masterDataDocumentResponse =
@@ -51,7 +52,7 @@ export default new class RewardsController {
                         points,
                         "orders": {
                             [OrderId]: {
-                                "orderValue": totalOrderItemsValue,
+                                orderValue,
                                 "operation": "credit"
                             }
                         }
@@ -69,7 +70,7 @@ export default new class RewardsController {
                             "orders": {
                                 ...masterDataDocumentResponse.data[id_client].orders,
                                 [OrderId]: {
-                                    "orderValue": totalOrderItemsValue,
+                                    orderValue,
                                     "operation": "credit"
                                 }
                             }
