@@ -51,7 +51,7 @@ export default new class RewardsController {
                         points,
                         "orders": {
                             [OrderId]: {
-                                orderValue,
+                                "orderValue": totalOrderItemsValue,
                                 "operation": "credit"
                             }
                         }
@@ -65,11 +65,11 @@ export default new class RewardsController {
                     {
                         [id_client]: {
                             ...masterDataDocumentResponse.data[id_client],
-                            "points": points + masterDataDocumentResponse.data[id_client].points,
+                            "points": +points + +masterDataDocumentResponse.data[id_client].points,
                             "orders": {
                                 ...masterDataDocumentResponse.data[id_client].orders,
                                 [OrderId]: {
-                                    orderValue,
+                                    "orderValue": totalOrderItemsValue,
                                     "operation": "credit"
                                 }
                             }
