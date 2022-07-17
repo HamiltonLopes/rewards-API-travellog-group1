@@ -24,8 +24,8 @@ export default new class RewardsController {
             
             let id_client = await orderResponse.data.clientProfileData.userProfileId; //captura o número do cliente pelo pedido
             let orderValue = await orderResponse.data.value; // valor total do pedido
-            let totalOrderItemsValue = await orderResponse.data.totals[0].value; //valor total dos itens do pedido
-            let orderValueWithoutShip = totalOrderItemsValue + (await orderResponse.data.totals[1].value); //valor total dos pontos (deduzindo o desconto)
+            //let totalOrderItemsValue = await orderResponse.data.totals[0].value; //valor total dos itens do pedido
+            let orderValueWithoutShip = orderValue - (await orderResponse.data.totals[2].value); //valor total dos pontos (deduzindo o desconto)
             let points = ((orderValueWithoutShip/100)+"").split(".")[0]; //Logica para eliminar os centavos
 
             //get no documento do masterdata
@@ -40,7 +40,7 @@ export default new class RewardsController {
                         points,
                         "orders": {
                             [OrderId]: {
-                                orderValue,
+                                "orderItemsValue": orderValueWithoutShip,
                                 "operation": "credit"
                             }
                         }
@@ -58,7 +58,7 @@ export default new class RewardsController {
                             "orders": {
                                 ...masterDataDocumentResponse.data[id_client].orders,
                                 [OrderId]: {
-                                    orderValue,
+                                    "orderItemsValue": orderValueWithoutShip,
                                     "operation": "credit"
                                 }
                             }
