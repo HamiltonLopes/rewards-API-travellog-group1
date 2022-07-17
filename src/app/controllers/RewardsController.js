@@ -1,18 +1,6 @@
 import axios from 'axios';
 import { response } from 'express';
 export default new class RewardsController {
-    // var client = {
-    //     id_client: {
-    //         id_client,
-    //         "points": orderValue,
-    //         "orders": {
-    //             OrderId: {
-    //                 orderValue,
-    //                 "operation": "credit"
-    //             }
-    //         }
-    //     }
-    // }; // estrutura do cliente
 
     async index(req, res) { //get número de pontos
         let { id_client } = req.params; //captura o numero do cliente pelo query da requisição
