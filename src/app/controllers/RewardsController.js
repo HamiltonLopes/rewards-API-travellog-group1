@@ -7,7 +7,9 @@ export default new class RewardsController {
         let masterDataDocumentResponse =
             await axios.get(`https://${process.env.ACCOUNT_NAME}.${process.env.ENVIROMENT}.com/api/dataentities/${process.env.DATA_ENTITY_NAME}/documents/${process.env.MASTERDATA_DOCUMENT_ID}?_fields=${id_client}`,
                 {headers:{"X-VTEX-API-AppKey": process.env.X_VTEX_API_AppKey, "X-VTEX-API-AppToken": process.env.X_VTEX_API_AppToken}});
-        let points = await masterDataDocumentResponse.data[id_client].points; // puxar os pontos do banco de dados pelo número do cliente
+        let points = await masterDataDocumentResponse?.data[id_client]?.points; // puxar os pontos do banco de dados pelo número do cliente
+        if(points === undefined)
+            points = 0;
         return res.status(201).json({ "points": points }); // retorna o número de pontos do cliente
     }
 
